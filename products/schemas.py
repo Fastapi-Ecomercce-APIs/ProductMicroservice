@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field,model_validator
-from typing import Optional
+from typing import Optional,List
 
 #Modelo para crear producto
 class ProductCreate(BaseModel):
@@ -21,6 +21,14 @@ class ProductoSend(BaseModel):
     
     class Config:
         from_attributes=True
+
+
+#Modelo para enviar varios productos al cliente
+class ProductsSend(BaseModel):
+    total_items:int
+    pages:int
+    current_page:int
+    items:List[ProductoSend]
 
 #Modelo para actualizar
 class ProductUpdate(ProductCreate):

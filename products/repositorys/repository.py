@@ -1,9 +1,12 @@
 
-from sqlalchemy import select
+from sqlalchemy import select,func
 from sqlalchemy.ext.asyncio import AsyncSession 
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
+from fastapi import Query
+import math
 
 from fastapi import HTTPException
+
 
 
 #Clase para cubrir el crud básico de cualquier modelo
@@ -24,13 +27,42 @@ class SQLAlchemyRepositoryCRUD():
         return object
 
     #Funcion para obtener todas las instancias del modelo
-    async def get_all(self):
-        stmt=select(self.item)
-        result=await self.session.execute(stmt)
-        objects=result.scalars().all()
+    async def get_all(self,page:int):
+
+        #Consulta para saber cuantos objetos hay
+        stmt2=select(func.count()).select_from(self.item)
+        
+        #Total de objetos
+        total_objetos= await self.session.scalar(stmt2)
+
+        #Total de paginas disponibles, math.ceil para redondear hacia arriba
+        paginas=math.ceil(total_objetos/10)
+
+        #Calculamos el offset
+        offset=(page-1)*10
+
+        #Consulta con paginacion
+        stmt=select(self.item).limit(10).offset(offset)
+        
+        try:
+            result=await self.session.execute(stmt)
+            objects=result.scalars().all()
+            if not objects:
+                raise HTTPException(status_code=404, detail=f"Ya no hay mas resultados, hay en total {total_objetos}")
+            
+            return {
+                "items":objects,
+                "pages": paginas,
+                "total_items":total_objetos,
+                "current_page":page
+
+            }
+        
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Hubo un problema a la hora de obtener los datos: {e}")
         
             
-        return objects
+
     
     #Funcion para actualizar una instancia
     async def update(self,object_id:int,new_object):

@@ -3,9 +3,9 @@ from models import Product, Category
 from sqlalchemy import and_
 from schemas import ProductCreate
 
-from sqlalchemy import select, func
+from sqlalchemy import select
 from fastapi import HTTPException
-from math import ceil
+
 
 class ProductService(SQLAlchemyRepositoryCRUD):
 
@@ -30,16 +30,21 @@ class ProductService(SQLAlchemyRepositoryCRUD):
         return product
     
     async def get_by_category(self, category_id: int):
+        stmt2=select(Category).where(Category.id==category_id)
+        result2= await self.session.execute(stmt2)
+        category=result2.scalar_one_or_none()
+        if not category:
+            raise HTTPException(status_code=404, detail="Esa categoría no existe")
         stmt=select(Product).where(Product.category_id==category_id)
 
         result= await self.session.execute(stmt)
         productos= result.scalars().all()
-        if not productos:
-            raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+        
         return productos
     
 
-    async def get_by_filters(self,page:int,nombre:str=None, precio_min:int=None, precio_max:int=None, category_id:int =None):
+    async def get_by_filters(self,nombre:str=None, precio_min:int=None, precio_max:int=None, category_id:int =None):
 
         
         filters=[]

@@ -35,11 +35,11 @@ async def create_product(model:schemas.ProductCreate, service:models_repository.
 @router.get("/get_one/{product_id}", response_model=schemas.ProductoSend, status_code=status.HTTP_200_OK)
 
 async def get_product(product_id, service:models_repository.ProductService=Depends(get_product_service)):
-        try:
-            resultado=await service.get_by_id(product_id)
-            return resultado
-        except:
-            raise HTTPException(status_code=504, detail="Limite de reintentos alcanzados")
+        
+        resultado=await service.get_by_id(product_id)
+        return resultado
+        
+            
 
 
     
@@ -82,7 +82,7 @@ async def get_by_category(category_id:int, service:models_repository.ProductServ
 
 #Ruta para obtener los productos segun filtros
 @router.get("/get_by_filters", response_model=List[schemas.ProductoSend], status_code=status.HTTP_200_OK)
-async def filters(nombre:Optional[str]=None, precio_min:Optional[int]=None, precio_max: Optional[int]=None, category_id: Optional[int]=None, service:models_repository.ProductService=Depends(get_product_service)):
+async def filters(filtros: schemas.ProductFilter ,service:models_repository.ProductService=Depends(get_product_service)):
 
-    resultado=await service.get_by_filters(nombre=nombre, precio_min=precio_min, precio_max=precio_max, category_id=category_id)
+    resultado=await service.get_by_filters(**filtros.model_dump(exclude_none=True))
     return resultado

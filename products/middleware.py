@@ -1,7 +1,6 @@
 import asyncio
 from fastapi import  Request,HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-
 from main import app
 
 #Middleware para timeout
@@ -12,6 +11,9 @@ async def timeout(request:Request, call_next):
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="El tiempo de espera se ha agotado")
     
+
+
+
 
 origins=[
     "http://localhost:4200",

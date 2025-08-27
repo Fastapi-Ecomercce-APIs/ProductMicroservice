@@ -10,7 +10,7 @@
 * Ejecutar el siguiente comando para instalar dependencias:
     * `pip install -r requirements.txt`
 
-* Una vez instaladas las dependencias , posicionarse en la carpeta contenedora de el archivo **main.py**, en este caso la carpeta *users*
+* Una vez instaladas las dependencias , posicionarse en la carpeta contenedora de el archivo **main.py**, en este caso la carpeta *productos*
 
 * Es necesario crear un archivo .env para establecer las variables de entorno, para eso mirar el archivo *.env.example* para tener una idea de como hacerlo
 
